@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 
-
+# File based on https://github.com/huyvnphan/PyTorch_CIFAR10/
 class VGG(nn.Module):
     def __init__(self, features, num_classes=10):
         super(VGG, self).__init__()
@@ -50,3 +50,32 @@ def vgg11_bn(device="cpu", weights_path = ".weights/state_dicts/vgg11_bn.pt"):
     )
     model.load_state_dict(state_dict)
     return model
+
+
+def eval_accuracy(model, dataloader, training_device='cpu'):
+    with torch.no_grad():
+        model.to(training_device)
+        correct = 0
+        all_so_far = 0
+        for inputs, labels in dataloader:
+            inputs, labels = inputs.to(training_device), labels.to(training_device)
+            pred = torch.argmax(model(inputs), dim=1)
+
+            all_so_far += labels.size().numel()
+            correct += torch.sum(pred.eq(labels))
+    return correct/all_so_far
+
+
+def training_func(model, optimizer, criterion, dataloader, dataloader_val, max_epochs, training_device='cpu', *_args, **_kwargs):
+    model.train()
+    model.to(training_device)
+    #torch.cuda.empty_cache()
+    for epoch in range(max_epochs):
+        for inputs, labels in dataloader:
+            inputs, labels = inputs.to(training_device), labels.to(training_device)
+            optimizer.zero_grad()
+            loss = criterion(model(inputs), labels)
+            loss.backward()
+            optimizer.step()
+        print("Epoch: {}, Accuracy on validation set: {}".format(epoch, eval_accuracy(model, dataloader_val, training_device)))
+    #torch.cuda.empty_cache()
