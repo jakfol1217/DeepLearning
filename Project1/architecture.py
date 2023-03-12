@@ -43,12 +43,14 @@ def make_vgg11_bn_layers(cfg = None):
     return nn.Sequential(*layers)
 
  # Create VGG11_bn model
-def vgg11_bn(device="cpu", weights_path = ".weights/state_dicts/vgg11_bn.pt"):
-    model = VGG(make_vgg11_bn_layers())
-    state_dict = torch.load(
-        weights_path, map_location=device
-    )
-    model.load_state_dict(state_dict)
+def vgg11_bn(device="cpu", pretrained=True, num_classes=10):
+    weights_path = ".weights/state_dicts/vgg11_bn.pt"
+    model = VGG(make_vgg11_bn_layers(), num_classes=num_classes)
+    if pretrained:
+        state_dict = torch.load(
+            weights_path, map_location=device
+        )
+        model.load_state_dict(state_dict)
     return model
 
 
@@ -66,12 +68,12 @@ def eval_accuracy(model, dataloader, training_device='cpu'):
     return correct/all_so_far
 
 
-def training_func(model, optimizer, criterion, dataloader, dataloader_val, max_epochs, training_device='cpu', *_args, **_kwargs):
+def training_func(model, optimizer, criterion, dataloader_train, dataloader_val, max_epochs, training_device='cpu', *_args, **_kwargs):
     model.train()
     model.to(training_device)
     #torch.cuda.empty_cache()
     for epoch in range(max_epochs):
-        for inputs, labels in dataloader:
+        for inputs, labels in dataloader_train:
             inputs, labels = inputs.to(training_device), labels.to(training_device)
             optimizer.zero_grad()
             loss = criterion(model(inputs), labels)
