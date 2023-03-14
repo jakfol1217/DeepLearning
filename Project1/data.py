@@ -18,6 +18,11 @@ name_dict={'airplane':0,
            'ship':8,
            'truck':9}
 
+transform = torchvision.transforms.Compose([
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    ])
+
 def return_cifar10_labels(path):
     with open(path) as csvfile:
         csvreader = csv.reader(csvfile)
@@ -49,22 +54,14 @@ class Cifar10Dataset(Dataset):
         return len(self.names)
 
 
-def load_cifar10_dataloaders():
-    transform = torchvision.transforms.Compose([
-        torchvision.transforms.ToTensor(),
-        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-    ])
+def load_cifar10_dataloaders(transform=transform):
     dataset_train = torchvision.datasets.CIFAR10(".data", download=True, transform=transform)
     dataloader_train = torch.utils.data.DataLoader(dataset_train, batch_size=16)
     dataset_test = torchvision.datasets.CIFAR10(".data", download=True, train=False, transform=transform)
     dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=16)
     return dataloader_train, dataloader_test
 
-def load_cifar10_dataloaders_validation():
-    transform = torchvision.transforms.Compose([
-        torchvision.transforms.ToTensor(),
-        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-    ])
+def load_cifar10_dataloaders_validation(transform=transform):
     dataset = torchvision.datasets.CIFAR10(".data", download=True, transform=transform)
     size_train = 0.9 * len(dataset)
     size_val = len(dataset) - size_train
@@ -77,20 +74,12 @@ def load_cifar10_dataloaders_validation():
 
 # Kaggle loaders
 
-def load_cifar10_train_dataloader_kaggle(path='.data-cifar/train', label_path='.data-cifar/trainLabels.csv'):
-    transform = torchvision.transforms.Compose([
-        torchvision.transforms.ToTensor(),
-        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-    ])
+def load_cifar10_train_dataloader_kaggle(path='.data-cifar/train', label_path='.data-cifar/trainLabels.csv', transform=transform):
     dataset = Cifar10Dataset(path, label_path, transform)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=16)
     return dataloader
 
-def load_cifar10_train_dataloaders_validation_kaggle(path='.data-cifar/train', label_path='.data-cifar/trainLabels.csv'):
-    transform = torchvision.transforms.Compose([
-        torchvision.transforms.ToTensor(),
-        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-    ])
+def load_cifar10_train_dataloaders_validation_kaggle(path='.data-cifar/train', label_path='.data-cifar/trainLabels.csv', transform=transform):
     dataset = Cifar10Dataset(path, label_path, transform)
     size_train = 0.9 * len(dataset)
     size_val = len(dataset) - size_train
@@ -99,11 +88,7 @@ def load_cifar10_train_dataloaders_validation_kaggle(path='.data-cifar/train', l
     dataloader_val = torch.utils.data.DataLoader(dataset_val, batch_size=16)
     return dataloader_train, dataloader_val
 
-def load_cifar10_test_dataloader_kaggle(path='.data-cifar/test'):
-    transform = torchvision.transforms.Compose([
-        torchvision.transforms.ToTensor(),
-        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-    ])
+def load_cifar10_test_dataloader_kaggle(path='.data-cifar/test', transform=transform):
     dataset = Cifar10Dataset(path, transform=transform)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=16)
     return dataloader
