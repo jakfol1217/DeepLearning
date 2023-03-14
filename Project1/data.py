@@ -75,6 +75,8 @@ def load_cifar10_dataloaders_validation():
     dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=16)
     return dataloader_train, dataloader_test, dataloader_val
 
+# Kaggle loaders
+
 def load_cifar10_train_dataloader_kaggle(path='.data-cifar/train', label_path='.data-cifar/trainLabels.csv'):
     transform = torchvision.transforms.Compose([
         torchvision.transforms.ToTensor(),
