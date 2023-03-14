@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import numpy as np
+
 
 # File based on https://github.com/huyvnphan/PyTorch_CIFAR10/
 class VGG(nn.Module):
