@@ -68,7 +68,17 @@ def eval_accuracy(model, dataloader, training_device='cpu'):
     return correct/all_so_far
 
 # Returns list of list as in sample submission
-# Warning: when writing to csv, 0 may be omitted - need a workaround
+name_dict={'airplane':0,
+           'automobile':1,
+           'bird':2,
+           'cat':3,
+           'deer':4,
+           'dog':5,
+           'frog':6,
+           'horse':7,
+           'ship':8,
+           'truck':9}
+
 def predict_kaggle_test(model, dataloader, training_device='cpu'):
     with torch.no_grad():
         model.to(training_device)
@@ -76,7 +86,7 @@ def predict_kaggle_test(model, dataloader, training_device='cpu'):
         for number, inputs in enumerate(dataloader):
             inputs = inputs.to(training_device)
             pred = torch.argmax(model(inputs), dim=1)
-            val = [number, str(pred)]
+            val = [number, list(name_dict.keys())[pred.item()]]
             labels.append(val)
     return labels
 
