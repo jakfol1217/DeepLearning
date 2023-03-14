@@ -67,6 +67,18 @@ def eval_accuracy(model, dataloader, training_device='cpu'):
             correct += torch.sum(pred.eq(labels))
     return correct/all_so_far
 
+# Returns list of list as in sample submission
+# Warning: when writing to csv, 0 may be omitted - need a workaround
+def predict_kaggle_test(model, dataloader, training_device='cpu'):
+    with torch.no_grad():
+        model.to(training_device)
+        labels=[["id", "label"]]
+        for number, inputs in enumerate(dataloader):
+            inputs = inputs.to(training_device)
+            pred = torch.argmax(model(inputs), dim=1)
+            val = [number, str(pred)]
+            labels.append(val)
+    return labels
 
 def training_func(model, optimizer, criterion, dataloader_train, dataloader_val, max_epochs, training_device='cpu', *_args, **_kwargs):
     model.train()
