@@ -98,11 +98,6 @@ class GaussianNoise(object):
         img = img + (torch.randn(size) * self.var)
         return img
 
-
-def add_gaussian_noise(img, variance):
-    img = img + torch.randn(*img.size) * np.sqrt(variance)
-    return img
-
 def augmented_cifar10_dataset_randomflip(aug_percentage):
     transform = torchvision.transforms.RandomHorizontalFlip()
     return augmented_cifar10_dataset(aug_percentage, transform)
