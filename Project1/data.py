@@ -6,6 +6,7 @@ import torchvision
 import csv
 from random import choices, sample
 from torch.utils.data import Subset, ConcatDataset
+import numpy as np
 
 # Data loading and augmentation
 
@@ -89,6 +90,19 @@ def load_cifar10_test_dataloader_kaggle(path='.data-cifar/test', transform=trans
 
 # PERCENTAGE IS INT- 2 MEANS 200% OF DATASET SIZE (minus 10% of validation) IS AUGMENTED DATA
 # ---------------------READY FUNCTIONS ----------------------------------
+class GaussianNoise(object):
+    def __init__(self, variance):
+        self.var = np.sqrt(variance)
+    def __call__(self, img):
+        size = img.size()
+        img = img + (torch.randn(size) * self.var)
+        return img
+
+
+def add_gaussian_noise(img, variance):
+    img = img + torch.randn(*img.size) * np.sqrt(variance)
+    return img
+
 def augmented_cifar10_dataset_randomflip(aug_percentage):
     transform = torchvision.transforms.RandomHorizontalFlip()
     return augmented_cifar10_dataset(aug_percentage, transform)
@@ -105,6 +119,14 @@ def augmented_cifar10_dataset_randomflip_rotate(aug_percentage, rotate):
     transform = torchvision.transforms.Compose([
         torchvision.transforms.RandomHorizontalFlip(),
         torchvision.transforms.RandomRotation(rotate)
+    ])
+    return augmented_cifar10_dataset(aug_percentage, transform)
+
+def augmented_cifar10_dataset_gauss_noise(aug_percentage, variance):
+    transform = torchvision.transforms.Compose([
+        torchvision.transforms.PILToTensor(),
+        GaussianNoise(variance),
+        torchvision.transforms.ToPILImage()
     ])
     return augmented_cifar10_dataset(aug_percentage, transform)
 
