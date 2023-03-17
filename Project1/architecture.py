@@ -27,7 +27,7 @@ class VGG(nn.Module):
         x = self.classifier(x)
         return x
 
- # Create convolution part of VGG11_bn archhitecture
+ # Create convolution part of VGG11_bn architecture
 def make_vgg11_bn_layers(cfg = None):
     if cfg == None:
         cfg = [64, "M", 128, "M", 256, 256, "M", 512, 512, "M", 512, 512, "M"]

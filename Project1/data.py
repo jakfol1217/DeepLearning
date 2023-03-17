@@ -61,13 +61,8 @@ global_transform = torchvision.transforms.Compose([
 ])
 
 
-def load_cifar10_dataloaders_validation(transform=global_transform, bs=16):
-    transform_test = torchvision.transforms.Compose([
-        torchvision.transforms.ToTensor(),
-        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-    ])
-    dataset = torchvision.datasets.CIFAR10(".data", download=True)
-    size_train = 0.9 * len(dataset)
+def _split_train_val(dataset, size, transform, transform_test, bs):
+    size_train = size * len(dataset)
     size_val = len(dataset) - size_train
     dataset_train, dataset_val = torch.utils.data.random_split(dataset, [int(size_train), int(size_val)])
     dataset_train.dataset = copy.deepcopy(dataset)
@@ -75,22 +70,31 @@ def load_cifar10_dataloaders_validation(transform=global_transform, bs=16):
     dataset_val.dataset.transform = transform_test
     dataloader_train = torch.utils.data.DataLoader(dataset_train, batch_size=bs)
     dataloader_val = torch.utils.data.DataLoader(dataset_val, batch_size=bs)
+    return dataloader_train, dataloader_val
+
+
+def load_cifar10_dataloaders_validation(transform=global_transform, bs=16):
+    transform_test = torchvision.transforms.Compose([
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    ])
+    dataset = torchvision.datasets.CIFAR10(".data", download=True)
+    dataloader_train, dataloader_val = _split_train_val(dataset, 0.9, transform, transform_test, bs)
     dataset_test = torchvision.datasets.CIFAR10(".data", download=True, train=False, transform=transform_test)
     dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=bs)
     return dataloader_train, dataloader_test, dataloader_val
-
 
 
 # Kaggle loaders
 
 def load_cifar10_train_dataloaders_validation_kaggle(path='.data-cifar/train', label_path='.data-cifar/trainLabels.csv',
                                                      transform=global_transform, bs=16):
+    transform_test = torchvision.transforms.Compose([
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    ])
     dataset = Cifar10Dataset(path, label_path, transform)
-    size_train = 0.9 * len(dataset)
-    size_val = len(dataset) - size_train
-    dataset_train, dataset_val = torch.utils.data.random_split(dataset, [int(size_train), int(size_val)])
-    dataloader_train = torch.utils.data.DataLoader(dataset_train, batch_size=bs)
-    dataloader_val = torch.utils.data.DataLoader(dataset_val, batch_size=bs)
+    dataloader_train, dataloader_val = _split_train_val(dataset, 0.9, transform, transform_test, bs)
     return dataloader_train, dataloader_val
 
 
