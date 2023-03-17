@@ -1,3 +1,4 @@
+import copy
 import os
 from PIL import Image
 from torch.utils.data import DataLoader, Dataset
@@ -10,21 +11,17 @@ import numpy as np
 
 # Data loading and augmentation
 
-name_dict={'airplane':0,
-           'automobile':1,
-           'bird':2,
-           'cat':3,
-           'deer':4,
-           'dog':5,
-           'frog':6,
-           'horse':7,
-           'ship':8,
-           'truck':9}
+name_dict = {'airplane': 0,
+             'automobile': 1,
+             'bird': 2,
+             'cat': 3,
+             'deer': 4,
+             'dog': 5,
+             'frog': 6,
+             'horse': 7,
+             'ship': 8,
+             'truck': 9}
 
-transform = torchvision.transforms.Compose([
-        torchvision.transforms.ToTensor(),
-        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-    ])
 
 def return_cifar10_labels(path):
     with open(path) as csvfile:
@@ -34,6 +31,7 @@ def return_cifar10_labels(path):
         label = name_dict.get(filename[1])
         filename[1] = label
     return filelist[1:]
+
 
 class Cifar10Dataset(Dataset):
     def __init__(self, path, labels_path=None, transform=None):
@@ -57,21 +55,36 @@ class Cifar10Dataset(Dataset):
         return len(self.names)
 
 
+global_transform = torchvision.transforms.Compose([
+    torchvision.transforms.ToTensor(),
+    torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+])
 
-def load_cifar10_dataloaders_validation(transform=transform, bs=16):
-    dataset = torchvision.datasets.CIFAR10(".data", download=True, transform=transform)
+
+def load_cifar10_dataloaders_validation(transform=global_transform, bs=16):
+    transform_test = torchvision.transforms.Compose([
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    ])
+    dataset = torchvision.datasets.CIFAR10(".data", download=True)
     size_train = 0.9 * len(dataset)
     size_val = len(dataset) - size_train
     dataset_train, dataset_val = torch.utils.data.random_split(dataset, [int(size_train), int(size_val)])
+    dataset_train.dataset = copy.deepcopy(dataset)
+    dataset_train.dataset.transform = transform
+    dataset_val.dataset.transform = transform_test
     dataloader_train = torch.utils.data.DataLoader(dataset_train, batch_size=bs)
     dataloader_val = torch.utils.data.DataLoader(dataset_val, batch_size=bs)
-    dataset_test = torchvision.datasets.CIFAR10(".data", download=True, train=False, transform=transform)
+    dataset_test = torchvision.datasets.CIFAR10(".data", download=True, train=False, transform=transform_test)
     dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=bs)
     return dataloader_train, dataloader_test, dataloader_val
 
+
+
 # Kaggle loaders
 
-def load_cifar10_train_dataloaders_validation_kaggle(path='.data-cifar/train', label_path='.data-cifar/trainLabels.csv', transform=transform, bs=16):
+def load_cifar10_train_dataloaders_validation_kaggle(path='.data-cifar/train', label_path='.data-cifar/trainLabels.csv',
+                                                     transform=global_transform, bs=16):
     dataset = Cifar10Dataset(path, label_path, transform)
     size_train = 0.9 * len(dataset)
     size_val = len(dataset) - size_train
@@ -80,95 +93,73 @@ def load_cifar10_train_dataloaders_validation_kaggle(path='.data-cifar/train', l
     dataloader_val = torch.utils.data.DataLoader(dataset_val, batch_size=bs)
     return dataloader_train, dataloader_val
 
-def load_cifar10_test_dataloader_kaggle(path='.data-cifar/test', transform=transform, bs=16):
-    dataset = Cifar10Dataset(path, transform=transform)
+
+def load_cifar10_test_dataloader_kaggle(path='.data-cifar/test', bs=16):
+    transform_test = torchvision.transforms.Compose([
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    ])
+    dataset = Cifar10Dataset(path, transform=transform_test)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=bs)
     return dataloader
+
 
 # DATA AUGMENTATION
 # Images are 32 x 32 - there is no point in resizing them
 
-# PERCENTAGE IS INT- 2 MEANS 200% OF DATASET SIZE (minus 10% of validation) IS AUGMENTED DATA
 # ---------------------READY FUNCTIONS ----------------------------------
 class GaussianNoise(object):
     def __init__(self, variance):
         self.var = np.sqrt(variance)
+
     def __call__(self, img):
         size = img.size()
         img = img + (torch.randn(size) * self.var)
         return img
 
-def augmented_cifar10_dataset_randomflip(aug_percentage):
-    transform = torchvision.transforms.RandomHorizontalFlip()
-    return augmented_cifar10_dataset(aug_percentage, transform)
 
-def augmented_cifar10_dataset_randomrotate(aug_percentage, rotate):
-    transform = torchvision.transforms.RandomRotation(rotate)
-    return augmented_cifar10_dataset(aug_percentage, transform)
-
-def augmented_cifar10_dataset_randomcrop(aug_percentage, size):
-    transform = torchvision.transforms.RandomCrop(size)
-    return augmented_cifar10_dataset(aug_percentage, transform)
-
-def augmented_cifar10_dataset_randomflip_rotate(aug_percentage, rotate):
+def augmented_cifar10_dataset_randomflip(bs=16):
     transform = torchvision.transforms.Compose([
         torchvision.transforms.RandomHorizontalFlip(),
-        torchvision.transforms.RandomRotation(rotate)
-    ])
-    return augmented_cifar10_dataset(aug_percentage, transform)
-
-def augmented_cifar10_dataset_gauss_noise(aug_percentage, variance):
-    transform = torchvision.transforms.Compose([
-        torchvision.transforms.PILToTensor(),
-        GaussianNoise(variance),
-        torchvision.transforms.ToPILImage()
-    ])
-    return augmented_cifar10_dataset(aug_percentage, transform)
-
-
-# ---------------------DEFINE-YOUR-OWN-TRANSFORMATION FUNCTION ----------------------------------
-def return_class_indexes(dataset):
-    class_indexes = [[] for i in range(10)]
-    for i in range(len(dataset)):
-        class_indexes[dataset[i][1]].append(i)
-    return class_indexes
-def augmented_cifar10_dataset(aug_percentage, aug_transform, bs=16):
-    # normal transform and augmentation transforms
-    transform = torchvision.transforms.Compose([
         torchvision.transforms.ToTensor(),
         torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
     ])
-    transform_full = torchvision.transforms.Compose([
-        aug_transform, transform
+    return load_cifar10_dataloaders_validation(transform, bs)
+
+
+def augmented_cifar10_dataset_randomrotate(rotate, bs=16):
+    transform = torchvision.transforms.Compose([
+        torchvision.transforms.RandomRotation(rotate),
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
     ])
-    # getting cifar 10 dataset
-    dataset = torchvision.datasets.CIFAR10(".data", download=True)
-    dataset_test = torchvision.datasets.CIFAR10(".data", download=True, train=False, transform=transform)
-    # get indexes for each class
-    class_indexes = return_class_indexes(dataset)
-    # get train and val datasets
-    indexes_val = []
-    for i in range(len(class_indexes)):
-        indexes_val += sample(class_indexes[i], k=int(len(class_indexes[i]) * 0.1))
-    indexes_train = [i for i in range(len(dataset)) if i not in indexes_val]
-    dataset_val = Subset(dataset, indexes_val)
-    dataset_train = Subset(dataset, indexes_train)
-    # get subset of dataset (can be bigger than dataset itself, also classes are still balanced)
-    class_indexes = return_class_indexes(dataset_train)
-    indexes = []
-    for i in range(len(class_indexes)):
-        indexes += choices(class_indexes[i], k=int(len(class_indexes[i]) * aug_percentage))
-    dataset_augmented = Subset(dataset, indexes)
-    # run transforms
-    dataset_train.dataset.transform = transform
-    dataset_val.dataset.transform = transform
-    dataset_augmented.dataset.transform = transform_full
-    dataset_full = ConcatDataset((dataset_train, dataset_augmented))
-    # create dataloaders (train, test and validation)
-    dataloader_val = torch.utils.data.DataLoader(dataset_val, batch_size=bs)
-    dataloader_full = torch.utils.data.DataLoader(dataset_full, batch_size=bs, shuffle=True)
-    dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=bs)
-    return dataloader_full, dataloader_test, dataloader_val
+    return load_cifar10_dataloaders_validation(transform, bs)
 
 
+def augmented_cifar10_dataset_randomcrop(size, bs=16):
+    transform = torchvision.transforms.Compose([
+        torchvision.transforms.RandomCrop(size),
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    ])
 
+    return load_cifar10_dataloaders_validation(transform, bs)
+
+
+def augmented_cifar10_dataset_randomflip_rotate(rotate, bs=16):
+    transform = torchvision.transforms.Compose([
+        torchvision.transforms.RandomHorizontalFlip(),
+        torchvision.transforms.RandomRotation(rotate),
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    ])
+    return load_cifar10_dataloaders_validation(transform, bs)
+
+
+def augmented_cifar10_dataset_gauss_noise(variance, bs=16):
+    transform = torchvision.transforms.Compose([
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+        GaussianNoise(variance)
+    ])
+    return load_cifar10_dataloaders_validation(transform, bs)
