@@ -167,3 +167,13 @@ def augmented_cifar10_dataset_gauss_noise(variance, bs=16):
         GaussianNoise(variance)
     ])
     return load_cifar10_dataloaders_validation(transform, bs)
+
+
+def augmented_cifar10_dataset_randomapply(rotate, bs=16):
+    transform = torchvision.transforms.Compose([
+        torchvision.transforms.RandomApply(transforms=[torchvision.transforms.RandomHorizontalFlip(),
+                                                       torchvision.transforms.RandomRotation(rotate)], p=0.5),
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    ])
+    return load_cifar10_dataloaders_validation(transform, bs)
