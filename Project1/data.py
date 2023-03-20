@@ -172,7 +172,7 @@ def augmented_cifar10_dataset_gauss_noise(variance, bs=16):
 def augmented_cifar10_dataset_randomflip_rotate_randomapply(rotate, bs=16):
     transform = torchvision.transforms.Compose([
         torchvision.transforms.ToTensor(),
-        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
         torchvision.transforms.RandomHorizontalFlip(),
         torchvision.transforms.RandomApply(transforms=[torchvision.transforms.RandomRotation(rotate)], p=0.25),
     ])
