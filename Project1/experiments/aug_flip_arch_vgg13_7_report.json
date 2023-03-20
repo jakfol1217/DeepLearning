@@ -1,1 +1,297 @@
-{"name": "vgg13", "run": "7", "best_accuracy_validation": 0.8628, "time_generated": "2023-03-19T22:24:47.773040", "trajectory": [{"epoch": 0, "train": 0.3518222222222222, "validation": 0.3568, "start_time": 1679260347.9310236, "duration": 12.505858182907104, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 1, "train": 0.5543777777777777, "validation": 0.5466, "start_time": 1679260371.3503065, "duration": 12.437251329421997, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 2, "train": 0.6664222222222222, "validation": 0.6646, "start_time": 1679260394.7471352, "duration": 12.38140082359314, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 3, "train": 0.7304888888888889, "validation": 0.706, "start_time": 1679260418.2215514, "duration": 12.374064922332764, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 4, "train": 0.7760666666666667, "validation": 0.746, "start_time": 1679260441.4934764, "duration": 12.304953575134277, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 5, "train": 0.8104666666666667, "validation": 0.7762, "start_time": 1679260464.8026001, "duration": 12.054102420806885, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 6, "train": 0.8317555555555556, "validation": 0.7978, "start_time": 1679260488.0942235, "duration": 12.16187858581543, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 7, "train": 0.8508666666666667, "validation": 0.8072, "start_time": 1679260511.2583816, "duration": 12.33228850364685, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 8, "train": 0.8670666666666667, "validation": 0.823, "start_time": 1679260534.594916, "duration": 12.275328397750854, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 9, "train": 0.8873777777777778, "validation": 0.8322, "start_time": 1679260557.849003, "duration": 12.078898906707764, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 10, "train": 0.8951111111111111, "validation": 0.8416, "start_time": 1679260581.0009115, "duration": 12.0818190574646, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 11, "train": 0.9033111111111111, "validation": 0.8412, "start_time": 1679260604.0545764, "duration": 12.013535261154175, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 12, "train": 0.9124, "validation": 0.8448, "start_time": 1679260626.8155127, "duration": 12.021857261657715, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 13, "train": 0.9249333333333334, "validation": 0.8462, "start_time": 1679260649.7989748, "duration": 12.096569538116455, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 14, "train": 0.9221111111111111, "validation": 0.8436, "start_time": 1679260672.7464411, "duration": 12.14200496673584, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 15, "train": 0.9356, "validation": 0.852, "start_time": 1679260695.752979, "duration": 12.24546194076538, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 16, "train": 0.9399777777777778, "validation": 0.8548, "start_time": 1679260719.0792775, "duration": 12.102532625198364, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 17, "train": 0.9414666666666667, "validation": 0.8522, "start_time": 1679260742.1491706, "duration": 12.039814710617065, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 18, "train": 0.9464222222222223, "validation": 0.8528, "start_time": 1679260764.8966978, "duration": 12.12981367111206, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 19, "train": 0.9512444444444444, "validation": 0.8462, "start_time": 1679260787.8589163, "duration": 12.068374395370483, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 20, "train": 0.9533555555555555, "validation": 0.8594, "start_time": 1679260810.7406075, "duration": 12.014973163604736, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 21, "train": 0.9520888888888889, "validation": 0.8518, "start_time": 1679260833.6917486, "duration": 12.055007934570312, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 22, "train": 0.9507333333333333, "validation": 0.8484, "start_time": 1679260856.548703, "duration": 12.155920267105103, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 23, "train": 0.9619777777777778, "validation": 0.8578, "start_time": 1679260879.499553, "duration": 12.212834358215332, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 24, "train": 0.9602888888888889, "validation": 0.8534, "start_time": 1679260902.6076415, "duration": 12.258074045181274, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 25, "train": 0.9652444444444445, "validation": 0.8604, "start_time": 1679260925.7132862, "duration": 12.221599578857422, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 26, "train": 0.9682444444444445, "validation": 0.864, "start_time": 1679260949.0001929, "duration": 12.10096549987793, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 27, "train": 0.9670444444444445, "validation": 0.8574, "start_time": 1679260972.3008707, "duration": 12.102011680603027, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 28, "train": 0.9704222222222222, "validation": 0.854, "start_time": 1679260995.2822416, "duration": 12.07905912399292, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 29, "train": 0.9707111111111111, "validation": 0.8582, "start_time": 1679261018.1706018, "duration": 12.081523180007935, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 30, "train": 0.9692888888888889, "validation": 0.8558, "start_time": 1679261041.055737, "duration": 12.083001852035522, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}, {"epoch": 31, "train": 0.9663777777777778, "validation": 0.858, "start_time": 1679261063.9189417, "duration": 12.046123504638672, "memory_allocated_mb": 1391.80908203125, "memory_reserved_mb": 1898.0}]}
+{
+  "name": "vgg13",
+  "run": "7",
+  "best_accuracy_validation": 0.8628,
+  "time_generated": "2023-03-19T22:24:47.773040",
+  "trajectory": [
+    {
+      "epoch": 0,
+      "train": 0.3518222222222222,
+      "validation": 0.3568,
+      "start_time": 1679260347.9310236,
+      "duration": 12.505858182907104,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 1,
+      "train": 0.5543777777777777,
+      "validation": 0.5466,
+      "start_time": 1679260371.3503065,
+      "duration": 12.437251329421997,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 2,
+      "train": 0.6664222222222222,
+      "validation": 0.6646,
+      "start_time": 1679260394.7471352,
+      "duration": 12.38140082359314,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 3,
+      "train": 0.7304888888888889,
+      "validation": 0.706,
+      "start_time": 1679260418.2215514,
+      "duration": 12.374064922332764,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 4,
+      "train": 0.7760666666666667,
+      "validation": 0.746,
+      "start_time": 1679260441.4934764,
+      "duration": 12.304953575134277,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 5,
+      "train": 0.8104666666666667,
+      "validation": 0.7762,
+      "start_time": 1679260464.8026001,
+      "duration": 12.054102420806885,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 6,
+      "train": 0.8317555555555556,
+      "validation": 0.7978,
+      "start_time": 1679260488.0942235,
+      "duration": 12.16187858581543,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 7,
+      "train": 0.8508666666666667,
+      "validation": 0.8072,
+      "start_time": 1679260511.2583816,
+      "duration": 12.33228850364685,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 8,
+      "train": 0.8670666666666667,
+      "validation": 0.823,
+      "start_time": 1679260534.594916,
+      "duration": 12.275328397750854,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 9,
+      "train": 0.8873777777777778,
+      "validation": 0.8322,
+      "start_time": 1679260557.849003,
+      "duration": 12.078898906707764,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 10,
+      "train": 0.8951111111111111,
+      "validation": 0.8416,
+      "start_time": 1679260581.0009115,
+      "duration": 12.0818190574646,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 11,
+      "train": 0.9033111111111111,
+      "validation": 0.8412,
+      "start_time": 1679260604.0545764,
+      "duration": 12.013535261154175,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 12,
+      "train": 0.9124,
+      "validation": 0.8448,
+      "start_time": 1679260626.8155127,
+      "duration": 12.021857261657715,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 13,
+      "train": 0.9249333333333334,
+      "validation": 0.8462,
+      "start_time": 1679260649.7989748,
+      "duration": 12.096569538116455,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 14,
+      "train": 0.9221111111111111,
+      "validation": 0.8436,
+      "start_time": 1679260672.7464411,
+      "duration": 12.14200496673584,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 15,
+      "train": 0.9356,
+      "validation": 0.852,
+      "start_time": 1679260695.752979,
+      "duration": 12.24546194076538,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 16,
+      "train": 0.9399777777777778,
+      "validation": 0.8548,
+      "start_time": 1679260719.0792775,
+      "duration": 12.102532625198364,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 17,
+      "train": 0.9414666666666667,
+      "validation": 0.8522,
+      "start_time": 1679260742.1491706,
+      "duration": 12.039814710617065,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 18,
+      "train": 0.9464222222222223,
+      "validation": 0.8528,
+      "start_time": 1679260764.8966978,
+      "duration": 12.12981367111206,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 19,
+      "train": 0.9512444444444444,
+      "validation": 0.8462,
+      "start_time": 1679260787.8589163,
+      "duration": 12.068374395370483,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 20,
+      "train": 0.9533555555555555,
+      "validation": 0.8594,
+      "start_time": 1679260810.7406075,
+      "duration": 12.014973163604736,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 21,
+      "train": 0.9520888888888889,
+      "validation": 0.8518,
+      "start_time": 1679260833.6917486,
+      "duration": 12.055007934570312,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 22,
+      "train": 0.9507333333333333,
+      "validation": 0.8484,
+      "start_time": 1679260856.548703,
+      "duration": 12.155920267105103,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 23,
+      "train": 0.9619777777777778,
+      "validation": 0.8578,
+      "start_time": 1679260879.499553,
+      "duration": 12.212834358215332,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 24,
+      "train": 0.9602888888888889,
+      "validation": 0.8534,
+      "start_time": 1679260902.6076415,
+      "duration": 12.258074045181274,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 25,
+      "train": 0.9652444444444445,
+      "validation": 0.8604,
+      "start_time": 1679260925.7132862,
+      "duration": 12.221599578857422,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 26,
+      "train": 0.9682444444444445,
+      "validation": 0.864,
+      "start_time": 1679260949.0001929,
+      "duration": 12.10096549987793,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 27,
+      "train": 0.9670444444444445,
+      "validation": 0.8574,
+      "start_time": 1679260972.3008707,
+      "duration": 12.102011680603027,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 28,
+      "train": 0.9704222222222222,
+      "validation": 0.854,
+      "start_time": 1679260995.2822416,
+      "duration": 12.07905912399292,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 29,
+      "train": 0.9707111111111111,
+      "validation": 0.8582,
+      "start_time": 1679261018.1706018,
+      "duration": 12.081523180007935,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 30,
+      "train": 0.9692888888888889,
+      "validation": 0.8558,
+      "start_time": 1679261041.055737,
+      "duration": 12.083001852035522,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    },
+    {
+      "epoch": 31,
+      "train": 0.9663777777777778,
+      "validation": 0.858,
+      "start_time": 1679261063.9189417,
+      "duration": 12.046123504638672,
+      "memory_allocated_mb": 1391.80908203125,
+      "memory_reserved_mb": 1898
+    }
+  ],
+  "augment": "flip"
+}
