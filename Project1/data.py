@@ -5,9 +5,8 @@ from torch.utils.data import DataLoader, Dataset
 import torch
 import torchvision
 import csv
-from random import choices, sample
-from torch.utils.data import Subset, ConcatDataset
 import numpy as np
+import random
 
 # Data loading and augmentation
 
@@ -73,6 +72,7 @@ def _split_train_val(dataset, size, transform, transform_test, bs):
     return dataloader_train, dataloader_val
 
 
+
 def load_cifar10_dataloaders_validation(transform=global_transform, bs=16):
     transform_test = torchvision.transforms.Compose([
         torchvision.transforms.ToTensor(),
@@ -112,11 +112,37 @@ def load_cifar10_test_dataloader_kaggle(path='.data-cifar/test', bs=16):
 # Images are 32 x 32 - there is no point in resizing them
 
 # ---------------------READY FUNCTIONS ----------------------------------
+
+class CutOut(object):
+    def __init__(self, num_holes, max_h_size=5, max_w_size=5, fill_value=0, p=0.5):
+        self.num_holes = num_holes
+        self.max_h_size = max_h_size
+        self.max_w_size = max_w_size
+        self.fill_value = fill_value
+        self.p = p
+
+    def __call__(self, img):
+        if random.uniform(0, 1) <= self.p:
+            img = copy.deepcopy(img)
+            h, w = img.size()[1:3]
+            if h < self.max_h_size or w < self.max_w_size:
+                raise Exception("Blank size is too large, covers entire picture.")
+            for i in range(self.num_holes):
+                y = random.randint(0, h-self.max_h_size)
+                x = random.randint(0, w-self.max_w_size)
+                y1 = min(y + self.max_h_size, h)
+                x1 = min(x + self.max_w_size, w)
+                for j in range(img.size()[0]):
+                    img[j, y:y1, x:x1] = self.fill_value
+        return img
+
+
 class GaussianNoise(object):
     def __init__(self, variance):
         self.var = np.sqrt(variance)
 
     def __call__(self, img):
+        img = copy.deepcopy(img)
         size = img.size()
         img = img + (torch.randn(size) * self.var)
         return img
@@ -146,7 +172,15 @@ def augmented_cifar10_dataset_randomcrop(size, bs=16):
         torchvision.transforms.ToTensor(),
         torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
     ])
+    return load_cifar10_dataloaders_validation(transform, bs)
 
+
+def augmented_cifar10_dataset_cutout(num_holes, bs=16):
+    transform = torchvision.transforms.Compose([
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+        CutOut(num_holes=num_holes)
+    ])
     return load_cifar10_dataloaders_validation(transform, bs)
 
 
@@ -177,6 +211,7 @@ def augmented_cifar10_dataset_randomflip_rotate_randomapply(rotate, bs=16):
         torchvision.transforms.RandomApply(transforms=[torchvision.transforms.RandomRotation(rotate)], p=0.25),
     ])
     return load_cifar10_dataloaders_validation(transform, bs)
+
 
 def augmented_cifar10_dataset_rotate_randomapply(rotate, bs=16):
     transform = torchvision.transforms.Compose([
