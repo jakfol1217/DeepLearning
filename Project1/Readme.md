@@ -1,1 +1,1 @@
-First project
+First project - convolutional neural networks.
