@@ -35,7 +35,7 @@ def return_cifar10_labels(path):
 class Cifar10Dataset(Dataset):
     def __init__(self, path, labels_path=None, transform=None):
         self.path = path
-        self.names = os.listdir(path)
+        self.names = sorted(os.listdir(path), key=lambda filename: int(filename.split(".")[0]))
         self.labels = None
         self.transform = transform
         if labels_path is not None:
