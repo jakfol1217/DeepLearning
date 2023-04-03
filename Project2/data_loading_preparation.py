@@ -19,8 +19,10 @@ name_dict = {'yes': 0,
              'off': 7,
              'stop': 8,
              'go': 9,
-             'silence':10}
-#unknown = 11
+             'silence': 10}
+
+
+# unknown = 11
 def get_audio_datasets(path=''):
     if len(path) > 0 and path[-1] != '/':
         path += '/'
@@ -62,12 +64,15 @@ def get_audio_datasets(path=''):
     test_dataset = AudioDataset(test_data)
     return train_dataset, test_dataset, valid_dataset
 
+
 def load_audio_dataloaders_validation(path='', bs=16):
     dataset_train, dataset_test, dataset_val = get_audio_datasets(path=path)
     dataloader_train = torch.utils.data.DataLoader(dataset_train, batch_size=bs)
     dataloader_val = torch.utils.data.DataLoader(dataset_val, batch_size=bs)
     dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=bs)
     return dataloader_train, dataloader_test, dataloader_val
+
+
 class DataPrep:
     # By default, the data have 16000 sampling rate and are monochannel
     @staticmethod
@@ -90,11 +95,13 @@ class DataPrep:
 
             data = np.concatenate((pad_start, data, pad_end))
         return data
+
     @staticmethod
     def spectogram_mfcc(data, sr, n_fft):
         mfcc = librosa.feature.mfcc(y=data, sr=sr, n_fft=n_fft)
         mfcc = librosa.amplitude_to_db(mfcc)
         return mfcc
+
     @staticmethod
     def scale_spec(spec):
         spec = preprocessing.scale(spec, axis=1)
@@ -110,6 +117,7 @@ class DataPrep:
 
     # This class will be expanded with additional transforms
     # TODO: https://towardsdatascience.com/preprocess-audio-data-with-the-signal-envelope-499e6072108
+
 
 class AudioDataset(Dataset):
     def __init__(self, data, mfcc=True, scale=False):
@@ -134,4 +142,3 @@ class AudioDataset(Dataset):
         if self.scale:
             spec = DataPrep.scale_spec(spec)
         return torch.from_numpy(spec), self.data['label'].iloc[item]
-

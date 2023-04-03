@@ -3,12 +3,14 @@ from kaggle.api.kaggle_api_extended import KaggleApi
 import os
 import py7zr
 
-# Get data from kaggle
-# You need to generate api key from kaggle and put it in ~/.kaggle/kaggle.json or C:\Users<Windows-username>.kaggle\kaggle.json
-def get_audioset_from_kaggle(load_test = False):
+
+# Get data from kaggle You need to generate api key from kaggle and put it in ~/.kaggle/kaggle.json or
+# C:\Users<Windows-username>.kaggle\kaggle.json
+def get_audioset_from_kaggle(load_test=False):
+
     # This function does not unpack test data by default, as it takes a lot of time and is unnecessary for training
     # It is advices to simply extract the test data by hand later
-    #
+
     api = KaggleApi()
     api.authenticate()
 
