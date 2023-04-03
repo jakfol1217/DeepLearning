@@ -1,3 +1,7 @@
 /Project1/playground.py
 /Project1/.data-cifar/
 /.idea/workspace.xml
+.idea/
+.weights/
+Project1/.data/
+Project1/__pycache__/
