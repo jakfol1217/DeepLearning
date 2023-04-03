@@ -20,9 +20,9 @@ name_dict = {'yes': 0,
              'stop': 8,
              'go': 9,
              'silence': 10}
+            # unknown = 11
 
 
-# unknown = 11
 def get_audio_datasets(path=''):
     if len(path) > 0 and path[-1] != '/':
         path += '/'
@@ -47,7 +47,8 @@ def get_audio_datasets(path=''):
 
     full_data = pd.concat([full_data, df_silence])
     full_data = full_data.sample(frac=1).reset_index(drop=True)
-    full_data['label'] = full_data['label'].map(name_dict).fillna(10)
+    # Assign labels to classes
+    full_data['label'] = full_data['label'].map(name_dict).fillna(11)
     # Get test and valid datasets
     test_data = (pd.read_csv(path + '.data-audioset/train/testing_list.txt', header=None)
                  .apply(lambda x: '.data-audioset/train/audio/' + x))
