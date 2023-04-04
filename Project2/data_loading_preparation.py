@@ -9,6 +9,8 @@ from pydub import AudioSegment
 
 import random
 
+random.seed(1217) # <- remember that
+
 name_dict = {'yes': 0,
              'no': 1,
              'up': 2,
@@ -23,6 +25,29 @@ name_dict = {'yes': 0,
             # unknown = 11
 
 
+def split_silence_to_chunks(path=''):
+    if len(path) > 0 and path[-1] != '/':
+        path += '/'
+    files = glob.glob(path + '.data-audioset/train/audio/_background_noise_/*.wav')
+
+    if len(files) > 6: # files have already been split
+        names = glob.glob(path + '.data-audioset/train/audio/_background_noise_/*_split.wav')
+        df_silence = pd.DataFrame({'file': names,
+                                   'label': ['silence' for i in range(len(names))]})
+        return df_silence, names
+
+    names = []
+    for file in files:
+        audio = AudioSegment.from_wav(file)
+        for i in range(len(audio) // 1000):
+            name = str.split(file, '.wav')[0] + '_' + str(i) + '_split.wav'
+            audio_cut = audio[1000 * i:1000 * (i + 1)]
+            audio_cut.export(name, format="wav")
+            names.append(name)
+    df_silence = pd.DataFrame({'file': names,
+                               'label': ['silence' for i in range(len(names))]})
+    return df_silence, names
+
 def get_audio_datasets(path=''):
     if len(path) > 0 and path[-1] != '/':
         path += '/'
@@ -33,18 +58,7 @@ def get_audio_datasets(path=''):
     full_data = full_data.rename({0: 'file'}, axis=1)
     full_data = full_data[full_data['label'] != '_background_noise_']
     # Add noise
-    files = glob.glob('.data-audioset/train/audio/_background_noise_/*.wav')
-    names = []
-    for file in files:
-        audio = AudioSegment.from_wav(file)
-        for i in range(len(audio) // 1000):
-            name = str.split(file, '.wav')[0] + '_' + str(i) + '.wav'
-            audio_cut = audio[1000 * i:1000 * (i + 1)]
-            audio_cut.export(name, format="wav")
-            names.append(name)
-    df_silence = pd.DataFrame({'file': names,
-                               'label': ['silence' for i in range(len(names))]})
-
+    df_silence, names = split_silence_to_chunks(path)
     full_data = pd.concat([full_data, df_silence])
     full_data = full_data.sample(frac=1).reset_index(drop=True)
     # Assign labels to classes
@@ -54,8 +68,8 @@ def get_audio_datasets(path=''):
                  .apply(lambda x: '.data-audioset/train/audio/' + x))
     valid_data = (pd.read_csv(path + '.data-audioset/train/validation_list.txt', header=None)
                   .apply(lambda x: '.data-audioset/train/audio/' + x))
-    test_data = pd.concat([test_data, pd.Series(names[12])])
-    valid_data = pd.concat([valid_data, pd.Series(names[-12])])
+    test_data = pd.concat([test_data, pd.Series([names[i] for i in [12, 120, 170]])])
+    valid_data = pd.concat([valid_data, pd.Series([names[i] for i in [-12, -120, -170]])])
     test_data = full_data[full_data['file'].isin(test_data[0])].reset_index()
     valid_data = full_data[full_data['file'].isin(valid_data[0])].reset_index()
     # Get train dataset
