@@ -55,7 +55,8 @@ def split_silence_to_chunks(path=''):
     return df_silence, names
 
 
-def get_audio_datasets(path=''):
+# limit_11 -- percentage of 11-th class that is to remain in datasets (values from 0 to 1)
+def get_audio_datasets(path='', limit_11=0.5):
     if len(path) > 0 and path[-1] != '/':
         path += '/'
     # Get full dataset
@@ -67,9 +68,13 @@ def get_audio_datasets(path=''):
     # Add noise
     df_silence, names = split_silence_to_chunks(path)
     full_data = pd.concat([full_data, df_silence])
-    full_data = full_data.sample(frac=1).reset_index(drop=True)
+
     # Assign labels to classes
     full_data['label'] = full_data['label'].map(name_dict).fillna(11)
+    # Limiting the number of "11" class
+    idx = full_data['label'] == 11
+    full_data = full_data[[i if i and random.uniform(0, 1) < limit_11 else not i for i in idx]]
+    full_data = full_data.sample(frac=1).reset_index(drop=True)
     # Get test and valid datasets
     test_data = (pd.read_csv(path + '.data-audioset/train/testing_list.txt', header=None)
                  .apply(lambda x: '.data-audioset/train/audio/' + x))
