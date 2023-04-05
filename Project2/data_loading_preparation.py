@@ -5,11 +5,13 @@ from torch.utils.data import DataLoader, Dataset
 import librosa
 import glob
 import torch
+import os
+import re
 from pydub import AudioSegment
 
 import random
 
-random.seed(1217) # <- remember that
+random.seed(1217)  # <- remember that
 
 name_dict = {'yes': 0,
              'no': 1,
@@ -22,7 +24,9 @@ name_dict = {'yes': 0,
              'stop': 8,
              'go': 9,
              'silence': 10}
-            # unknown = 11
+
+
+# unknown = 11
 
 
 def split_silence_to_chunks(path=''):
@@ -30,8 +34,9 @@ def split_silence_to_chunks(path=''):
         path += '/'
     files = glob.glob(path + '.data-audioset/train/audio/_background_noise_/*.wav')
 
-    if len(files) > 6: # files have already been split
+    if len(files) > 6:  # files have already been split
         names = glob.glob(path + '.data-audioset/train/audio/_background_noise_/*_split.wav')
+        names = [str.replace(name, '\\', '/') for name in names]
         df_silence = pd.DataFrame({'file': names,
                                    'label': ['silence' for i in range(len(names))]})
         return df_silence, names
@@ -44,9 +49,11 @@ def split_silence_to_chunks(path=''):
             audio_cut = audio[1000 * i:1000 * (i + 1)]
             audio_cut.export(name, format="wav")
             names.append(name)
+    names = [str.replace(name, '\\', '/') for name in names]
     df_silence = pd.DataFrame({'file': names,
                                'label': ['silence' for i in range(len(names))]})
     return df_silence, names
+
 
 def get_audio_datasets(path=''):
     if len(path) > 0 and path[-1] != '/':
@@ -74,9 +81,16 @@ def get_audio_datasets(path=''):
     valid_data = full_data[full_data['file'].isin(valid_data[0])].reset_index()
     # Get train dataset
     train_data = full_data[~full_data['file'].isin(pd.concat([test_data['file'], valid_data['file']]))]
-    train_dataset = AudioDataset(train_data)
-    valid_dataset = AudioDataset(valid_data)
-    test_dataset = AudioDataset(test_data)
+    train_dataset = AudioDataset(train_data, 'train')
+    valid_dataset = AudioDataset(valid_data, 'val')
+    test_dataset = AudioDataset(test_data, 'test')
+    # If cached folder does not exist, create it
+    if not os.path.exists('.data-audioset/cached_train'):
+        os.makedirs('.data-audioset/cached_train')
+    if not os.path.exists('.data-audioset/cached_val'):
+        os.makedirs('.data-audioset/cached_val')
+    if not os.path.exists('.data-audioset/cached_test'):
+        os.makedirs('.data-audioset/cached_test')
     return train_dataset, test_dataset, valid_dataset
 
 
@@ -94,6 +108,17 @@ class DataPrep:
     def load(path, sr, mono=True):
         data, sr = librosa.load(path, sr=sr, mono=mono)
         return data, sr
+
+    @staticmethod
+    def load_cached(path, item, string):
+        cached_path = str.split(path, '.wav')
+        cached_path = cached_path[0] + f'_cached_' + str(item)  # adding item num because not all names are unique
+        cached_path = re.sub('train/audio/.*/', f'cached_{string}/', cached_path)
+        try:
+            spec = torch.load(cached_path)
+        except:
+            return None
+        return spec
 
     @staticmethod
     def resize(data, max_size):
@@ -135,7 +160,7 @@ class DataPrep:
 
 
 class AudioDataset(Dataset):
-    def __init__(self, data, mfcc=True, scale=False):
+    def __init__(self, data, cache_str, mfcc=True, scale=False):
         self.data = data
         self.mfcc = mfcc
         self.scale = scale
@@ -143,12 +168,19 @@ class AudioDataset(Dataset):
         self.n_fft = 512
         self.n_mels = 256
         self.max_size = 16_000
+        self.cache_str = cache_str
 
     def __len__(self):
         return len(self.data)
 
     def __getitem__(self, item):
-        file, sr = DataPrep.load(self.data['file'].iloc[item], self.sr)
+        path, sr = self.data['file'].iloc[item], self.sr
+        # Loading cached file (tensor file)
+        spec = DataPrep.load_cached(path, item, self.cache_str)
+        if spec is not None:
+            return spec, self.data['label'].iloc[item]
+
+        file, sr = DataPrep.load(path, sr)
         file = DataPrep.resize(file, self.max_size)
         if self.mfcc:
             spec = DataPrep.spectogram_mfcc(file, sr, self.n_fft)
@@ -156,4 +188,9 @@ class AudioDataset(Dataset):
             spec = DataPrep.spectro_gram(file, sr, self.n_mels, self.n_fft)
         if self.scale:
             spec = DataPrep.scale_spec(spec)
-        return torch.from_numpy(spec), self.data['label'].iloc[item]
+        spec = torch.from_numpy(spec).float()
+        cached_path = str.split(path, '.wav')
+        cached_path = cached_path[0] + f'_cached_' + str(item)  # adding item num because not all names are unique
+        cached_path = re.sub('train/audio/.*/', f'cached_{self.cache_str}/', cached_path)
+        torch.save(spec, cached_path)
+        return spec, self.data['label'].iloc[item]
