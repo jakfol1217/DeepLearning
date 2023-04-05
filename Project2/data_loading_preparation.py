@@ -59,23 +59,23 @@ def split_silence_to_chunks(path=''):
 def get_audio_datasets(path='', limit_11=0.5):
     if len(path) > 0 and path[-1] != '/':
         path += '/'
-    # Get full dataset
+    # GET FULL DATASET
     files = glob.glob(path + '.data-audioset/train/audio/*/*.wav')
     full_data = pd.DataFrame(pd.Series(files).apply(lambda x: str.replace(x, '\\', '/')))
     full_data['label'] = full_data[0].apply(lambda x: x.split('/')[3])
     full_data = full_data.rename({0: 'file'}, axis=1)
     full_data = full_data[full_data['label'] != '_background_noise_']
-    # Add noise
+    # ADD NOISE
     df_silence, names = split_silence_to_chunks(path)
     full_data = pd.concat([full_data, df_silence])
 
-    # Assign labels to classes
+    # ASSIGN LABELS TO CLASSES
     full_data['label'] = full_data['label'].map(name_dict).fillna(11)
     # Limiting the number of "11" class
     idx = full_data['label'] == 11
     full_data = full_data[[i if i and random.uniform(0, 1) < limit_11 else not i for i in idx]]
     full_data = full_data.sample(frac=1).reset_index(drop=True)
-    # Get test and valid datasets
+    # GET TEST AND VALIDATION DATASETS
     test_data = (pd.read_csv(path + '.data-audioset/train/testing_list.txt', header=None)
                  .apply(lambda x: '.data-audioset/train/audio/' + x))
     valid_data = (pd.read_csv(path + '.data-audioset/train/validation_list.txt', header=None)
@@ -84,18 +84,20 @@ def get_audio_datasets(path='', limit_11=0.5):
     valid_data = pd.concat([valid_data, pd.Series([names[i] for i in [-12, -120, -170]])])
     test_data = full_data[full_data['file'].isin(test_data[0])].reset_index()
     valid_data = full_data[full_data['file'].isin(valid_data[0])].reset_index()
-    # Get train dataset
+    # GET TRAIN DATASET
     train_data = full_data[~full_data['file'].isin(pd.concat([test_data['file'], valid_data['file']]))]
+    # CREATE DATASETS
     train_dataset = AudioDataset(train_data, 'train')
     valid_dataset = AudioDataset(valid_data, 'val')
     test_dataset = AudioDataset(test_data, 'test')
-    # If cached folder does not exist, create it
-    if not os.path.exists('.data-audioset/cached_train'):
-        os.makedirs('.data-audioset/cached_train')
-    if not os.path.exists('.data-audioset/cached_val'):
-        os.makedirs('.data-audioset/cached_val')
-    if not os.path.exists('.data-audioset/cached_test'):
-        os.makedirs('.data-audioset/cached_test')
+    # CACHING MANAGEMENT
+    # If cached folder do not exist, create it
+    for dats in ['train', 'val', 'test']:
+        if not os.path.exists('.data-audioset/cached_' + dats):
+            os.makedirs('.data-audioset/cached_' + dats)
+        files = glob.glob('.data-audioset/cached_' + dats + '/*')
+        for f in files:
+            os.remove(f)
     return train_dataset, test_dataset, valid_dataset
 
 
