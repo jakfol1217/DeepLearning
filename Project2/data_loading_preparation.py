@@ -96,8 +96,6 @@ def get_audio_datasets(path='', limit_11=0.5):
         if not os.path.exists('.data-audioset/cached_' + dats):
             os.makedirs('.data-audioset/cached_' + dats)
         files = glob.glob('.data-audioset/cached_' + dats + '/*')
-        for f in files:
-            os.remove(f)
     return train_dataset, test_dataset, valid_dataset
 
 
