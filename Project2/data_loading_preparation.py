@@ -107,6 +107,15 @@ def load_audio_dataloaders_validation(path='', bs=16, limit_11=0.5):
     dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=bs)
     return dataloader_train, dataloader_test, dataloader_val
 
+def cache_all():
+    train_dataset, test_dataset, valid_dataset = get_audio_datasets(limit_11=1)
+    # simply access all the files, they will all get cached
+    for a in range(len(train_dataset)):
+        train_dataset[a]
+    for a in range(len(test_dataset)):
+        test_dataset[a]
+    for a in range(len(valid_dataset)):
+        valid_dataset[a]
 
 class DataPrep:
     # By default, the data have 16000 sampling rate and are monochannel
