@@ -4,6 +4,7 @@
 .idea/
 .weights/
 Project1/.data/
-Project1/__pycache__/
+*/__pycache__/
+*/.ipynb_checkpoints/
 /Project2/sound_playground.ipynb
 /Project2/.data-audioset
