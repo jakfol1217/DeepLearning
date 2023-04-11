@@ -100,8 +100,8 @@ def get_audio_datasets(path='', limit_11=0.5):
     return train_dataset, test_dataset, valid_dataset
 
 
-def load_audio_dataloaders_validation(path='', bs=16):
-    dataset_train, dataset_test, dataset_val = get_audio_datasets(path=path)
+def load_audio_dataloaders_validation(path='', bs=16, limit_11=0.5):
+    dataset_train, dataset_test, dataset_val = get_audio_datasets(path=path, limit_11=limit_11)
     dataloader_train = torch.utils.data.DataLoader(dataset_train, batch_size=bs)
     dataloader_val = torch.utils.data.DataLoader(dataset_val, batch_size=bs)
     dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=bs)
