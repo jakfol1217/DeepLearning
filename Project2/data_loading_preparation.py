@@ -1,3 +1,5 @@
+import copy
+
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
@@ -24,6 +26,7 @@ name_dict = {'yes': 0,
              'stop': 8,
              'go': 9,
              'silence': 10}
+
 
 # unknown = 11
 
@@ -94,8 +97,8 @@ def get_audio_datasets(path='', limit_11=0.5):
     for dats in ['train', 'val', 'test']:
         if not os.path.exists('.data-audioset/cached_' + dats):
             os.makedirs('.data-audioset/cached_' + dats)
-        #files = glob.glob('.data-audioset/cached_' + dats + '/*') #emptying cache
-        #for f in files:
+        # files = glob.glob('.data-audioset/cached_' + dats + '/*') #emptying cache
+        # for f in files:
         #    os.remove(f)
     return train_dataset, test_dataset, valid_dataset
 
@@ -107,13 +110,14 @@ def load_audio_dataloaders_validation(path='', bs=16, limit_11=0.5):
     dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=bs)
     return dataloader_train, dataloader_test, dataloader_val
 
+
 def cache_all():
     train_dataset, test_dataset, valid_dataset = get_audio_datasets(limit_11=1)
     # simply access all the files, they will all get cached
     print("Processing train dataset:")
     for a in range(len(train_dataset)):
         train_dataset[a]
-        print(f"Processed {a+1} out of {len(train_dataset)}", end="\r")
+        print(f"Processed {a + 1} out of {len(train_dataset)}", end="\r")
     print("Train dataset processed")
     print("Processing test dataset:")
     for a in range(len(test_dataset)):
@@ -125,6 +129,7 @@ def cache_all():
         valid_dataset[a]
         print(f"Processed {a + 1} out of {len(valid_dataset)}", end="\r")
     print("Validation dataset processed")
+
 
 class DataPrep:
     # By default, the data have 16000 sampling rate and are monochannel
@@ -144,6 +149,7 @@ class DataPrep:
             return None
         return spec
 
+    # -----------------PREPROCESSING-----------------
     @staticmethod
     def resize(data, max_size):
         data_len = data.shape[0]
@@ -160,11 +166,52 @@ class DataPrep:
             data = np.concatenate((pad_start, data, pad_end))
         return data
 
+    # -----------------AUGMENTATION-----------------
+    @staticmethod
+    def time_shift(data, limit):
+        _, sig_len = data.shape
+        shift_amt = int(random.random() * limit * sig_len)
+        return data.roll(shift_amt)
+
+    @staticmethod
+    def pitch_sift(data, sr, factor):
+        augmented_data = librosa.effects.pitch_shift(data, sr, factor)
+        return augmented_data
+
+    @staticmethod
+    def speed_shift(data, rate, sr = None):
+        augmented_data = librosa.effects.time_stretch(data, rate=rate)
+        return augmented_data
+    @staticmethod
+    def freq_masking(spec, freq_limit=3, num_masks=1):
+        spec_aug = copy.deepcopy(spec)
+        num_mel_channels = spec_aug.shape[0]
+        for i in range(num_masks):
+            window = random.randrange(1, freq_limit)
+            win_end = random.randrange(window, num_mel_channels)
+            spec_aug[max(0, win_end-window):win_end] = spec_aug.mean()
+        return spec_aug
+
+    @staticmethod
+    def time_mask(spec, time_limit=5, num_masks=1):
+        spec_aug = copy.deepcopy(spec)
+        length = spec_aug.shape[1]
+        for i in range(num_masks):
+            window = random.randrange(1, time_limit)
+            win_end = random.randrange(window, length)
+            spec_aug[:,max(0, win_end - window):win_end] = spec_aug.mean()
+        return spec_aug
+
+    # -----------------CREATE SPECTOGRAM-----------------
     @staticmethod
     def spectogram_mfcc(data, sr, n_fft):
         mfcc = librosa.feature.mfcc(y=data, sr=sr, n_fft=n_fft)
-        mfcc = librosa.amplitude_to_db(mfcc)
         return mfcc
+
+    @staticmethod
+    def spec_to_db(spec):
+        spec = librosa.amplitude_to_db(spec)
+        return spec
 
     @staticmethod
     def scale_spec(spec):
@@ -184,15 +231,23 @@ class DataPrep:
 
 
 class AudioDataset(Dataset):
-    def __init__(self, data, cache_str, mfcc=True, scale=False):
+    def __init__(self, data, cache_str, mfcc=True, scale=False, to_db=True, transform=None, sr=16_000, n_fft=512, n_mels=256,
+                 max_size=16_000):
         self.data = data
+        # SPECTOGRAM OPTIONS
         self.mfcc = mfcc
         self.scale = scale
-        self.sr = 16_000
-        self.n_fft = 512
-        self.n_mels = 256
-        self.max_size = 16_000
+        self.to_db = to_db
+
+        # AUDIO PARAMETERS
+        self.sr = sr
+        self.n_fft = n_fft
+        self.n_mels = n_mels
+        self.max_size = max_size
+        # CACHE PATH
         self.cache_str = cache_str
+        # TRANSFORMATIONS
+        self.transform = transform
 
     def __len__(self):
         return len(self.data)
@@ -210,12 +265,29 @@ class AudioDataset(Dataset):
             spec = DataPrep.spectogram_mfcc(file, sr, self.n_fft)
         else:
             spec = DataPrep.spectro_gram(file, sr, self.n_mels, self.n_fft)
+        if self.to_db:
+            spec = DataPrep.spec_to_db(spec)
         if self.scale:
             spec = DataPrep.scale_spec(spec)
         spec = torch.from_numpy(spec).float()
         # save spec to cache
         cached_path = str.split(path, '.wav')
-        cached_path = cached_path[0] + f'_cached_' + str.split(path, '/')[3]  # adding item num because not all names are unique
+        cached_path = cached_path[0] + f'_cached_' + str.split(path, '/')[
+            3]  # adding item num because not all names are unique
         cached_path = re.sub('train/audio/.*/', f'cached_{self.cache_str}/', cached_path)
         torch.save(spec, cached_path)
         return spec, self.data['label'].iloc[item]
+
+    def set_params(self, mfcc=True, scale=False, to_db=True, transform=None, sr=16_000, n_fft=512, n_mels=256,
+                 max_size=16_000):
+        self.mfcc = mfcc
+        self.scale = scale
+        self.to_db = to_db
+
+        # AUDIO PARAMETERS
+        self.sr = sr
+        self.n_fft = n_fft
+        self.n_mels = n_mels
+        self.max_size = max_size
+        # TRANSFORMATIONS
+        self.transform = transform
