@@ -199,7 +199,7 @@ class DataPrep:
         for i in range(num_masks):
             window = random.randrange(1, time_limit)
             win_end = random.randrange(window, length)
-            spec_aug[:,max(0, win_end - window):win_end] = spec_aug.mean()
+            spec_aug[:, max(0, win_end - window):win_end] = spec_aug.mean()
         return spec_aug
 
     # -----------------CREATE SPECTOGRAM-----------------
