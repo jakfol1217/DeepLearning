@@ -25,7 +25,6 @@ name_dict = {'yes': 0,
              'go': 9,
              'silence': 10}
 
-
 # unknown = 11
 
 
@@ -74,7 +73,7 @@ def get_audio_datasets(path='', limit_11=0.5):
     # Limiting the number of "11" class
     idx = full_data['label'] == 11
     full_data = full_data[[i if i and random.uniform(0, 1) < limit_11 else not i for i in idx]]
-    full_data = full_data.sample(frac=1).reset_index(drop=True)
+    full_data = full_data.sample(frac=1, random_state=2137).reset_index(drop=True)
     # GET TEST AND VALIDATION DATASETS
     test_data = (pd.read_csv(path + '.data-audioset/train/testing_list.txt', header=None)
                  .apply(lambda x: '.data-audioset/train/audio/' + x))
@@ -91,11 +90,13 @@ def get_audio_datasets(path='', limit_11=0.5):
     valid_dataset = AudioDataset(valid_data, 'val')
     test_dataset = AudioDataset(test_data, 'test')
     # CACHING MANAGEMENT
-    # If cached folder do not exist, create it
+    # If cached folder does not exist, create it
     for dats in ['train', 'val', 'test']:
         if not os.path.exists('.data-audioset/cached_' + dats):
             os.makedirs('.data-audioset/cached_' + dats)
-        files = glob.glob('.data-audioset/cached_' + dats + '/*')
+        #files = glob.glob('.data-audioset/cached_' + dats + '/*') #emptying cache
+        #for f in files:
+        #    os.remove(f)
     return train_dataset, test_dataset, valid_dataset
 
 
@@ -106,6 +107,24 @@ def load_audio_dataloaders_validation(path='', bs=16, limit_11=0.5):
     dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=bs)
     return dataloader_train, dataloader_test, dataloader_val
 
+def cache_all():
+    train_dataset, test_dataset, valid_dataset = get_audio_datasets(limit_11=1)
+    # simply access all the files, they will all get cached
+    print("Processing train dataset:")
+    for a in range(len(train_dataset)):
+        train_dataset[a]
+        print(f"Processed {a+1} out of {len(train_dataset)}", end="\r")
+    print("Train dataset processed")
+    print("Processing test dataset:")
+    for a in range(len(test_dataset)):
+        test_dataset[a]
+        print(f"Processed {a + 1} out of {len(test_dataset)}", end="\r")
+    print("Test dataset processed")
+    print("Processing validation dataset:")
+    for a in range(len(valid_dataset)):
+        valid_dataset[a]
+        print(f"Processed {a + 1} out of {len(valid_dataset)}", end="\r")
+    print("Validation dataset processed")
 
 class DataPrep:
     # By default, the data have 16000 sampling rate and are monochannel
@@ -181,10 +200,10 @@ class AudioDataset(Dataset):
     def __getitem__(self, item):
         path, sr = self.data['file'].iloc[item], self.sr
         # Loading cached file (tensor file)
-        spec = DataPrep.load_cached(path, item, self.cache_str)
+        spec = DataPrep.load_cached(path, str.split(path, '/')[3], self.cache_str)
         if spec is not None:
             return spec, self.data['label'].iloc[item]
-
+        # if not cached, file preparation:
         file, sr = DataPrep.load(path, sr)
         file = DataPrep.resize(file, self.max_size)
         if self.mfcc:
@@ -194,8 +213,9 @@ class AudioDataset(Dataset):
         if self.scale:
             spec = DataPrep.scale_spec(spec)
         spec = torch.from_numpy(spec).float()
+        # save spec to cache
         cached_path = str.split(path, '.wav')
-        cached_path = cached_path[0] + f'_cached_' + str(item)  # adding item num because not all names are unique
+        cached_path = cached_path[0] + f'_cached_' + str.split(path, '/')[3]  # adding item num because not all names are unique
         cached_path = re.sub('train/audio/.*/', f'cached_{self.cache_str}/', cached_path)
         torch.save(spec, cached_path)
         return spec, self.data['label'].iloc[item]
