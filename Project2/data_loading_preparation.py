@@ -150,6 +150,9 @@ class DataPrep:
         return spec
 
     # -----------------PREPROCESSING-----------------
+    # ----------------- data - means audio signal in time domain, that is, what is read from .wav file -----------------
+    # ----------------- spec - means the spetogram constructed from data -----------------
+    # ----------------- sr - sample rate, according to readme- 16_000 -----------------
     @staticmethod
     def resize(data, max_size):
         data_len = data.shape[0]
