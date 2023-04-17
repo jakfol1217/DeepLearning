@@ -177,32 +177,35 @@ class DataPrep:
         return np.roll(data, shift_amt)
 
     @staticmethod
-    def pitch_sift(data, sr, factor):
-        augmented_data = librosa.effects.pitch_shift(data, sr, factor)
+    def pitch_shift(data, factor, sr=16_000):
+        augmented_data = librosa.effects.pitch_shift(y=data, sr=sr, n_steps=factor)
         return augmented_data
 
     @staticmethod
     def speed_shift(data, rate, sr = None):
-        augmented_data = librosa.effects.time_stretch(data, rate=rate)
+        augmented_data = librosa.effects.time_stretch(y=data, rate=rate)
+        augmented_data = librosa.core.resample(y=augmented_data, orig_sr=len(augmented_data), target_sr=16000)
         return augmented_data
     @staticmethod
     def freq_masking(spec, freq_limit=3, num_masks=1):
         spec_aug = copy.deepcopy(spec)
         num_mel_channels = spec_aug.shape[0]
+        mn = spec_aug.mean()
         for i in range(num_masks):
             window = random.randrange(1, freq_limit)
             win_end = random.randrange(window, num_mel_channels)
-            spec_aug[max(0, win_end-window):win_end] = spec_aug.mean()
+            spec_aug[max(0, win_end-window):win_end] = mn
         return spec_aug
 
     @staticmethod
     def time_mask(spec, time_limit=5, num_masks=1):
         spec_aug = copy.deepcopy(spec)
         length = spec_aug.shape[1]
+        mn = spec_aug.mean()
         for i in range(num_masks):
             window = random.randrange(1, time_limit)
             win_end = random.randrange(window, length)
-            spec_aug[:, max(0, win_end - window):win_end] = spec_aug.mean()
+            spec_aug[:, max(0, win_end - window):win_end] = mn
         return spec_aug
 
     # -----------------CREATE SPECTOGRAM-----------------
