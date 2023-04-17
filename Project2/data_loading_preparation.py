@@ -172,9 +172,9 @@ class DataPrep:
     # -----------------AUGMENTATION-----------------
     @staticmethod
     def time_shift(data, limit):
-        _, sig_len = data.shape
+        sig_len = data.shape[0]
         shift_amt = int(random.random() * limit * sig_len)
-        return data.roll(shift_amt)
+        return np.roll(data, shift_amt)
 
     @staticmethod
     def pitch_sift(data, sr, factor):
@@ -229,8 +229,6 @@ class DataPrep:
         spec = librosa.amplitude_to_db(spec)
         return spec
 
-    # This class will be expanded with additional transforms
-    # TODO: https://towardsdatascience.com/preprocess-audio-data-with-the-signal-envelope-499e6072108
 
 
 class AudioDataset(Dataset):
