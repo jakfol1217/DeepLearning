@@ -135,7 +135,7 @@ class DataPrep:
         return spec
 
 
-# -------------------------PARAMS-------------------------
+# -------------------------DEFAULT PARAMS-------------------------
 name_dict = {'yes': 0,
              'no': 1,
              'up': 2,
@@ -224,16 +224,21 @@ class SpeedShift(object):
         data_aug = DataPrep.speed_shift(data_aug, self.rate)
         return data_aug
 
-
+# ALL THE POSSIBLE AUGMENTS AS A REFERENCE
 augments = {
-    'transform_time': [TimeShift(5), PitchShift(5), SpeedShift(5)],
-    'transform_spec': [FreqMask(5), TimeMask(5)]
+    'transform_time': [TimeShift(), PitchShift(), SpeedShift()],
+    'transform_spec': [FreqMask(), TimeMask()]
 }
 
 
 # -------------------------END OF TRANSFORMATION CLASSES-------------------------
 
 def split_silence_to_chunks(path=''):
+    """
+    split background noise files into chunks for "noise" class
+    :param path: non-absolute path to audio files
+    :return: split files names in form of dataframe
+    """
     if len(path) > 0 and path[-1] != '/':
         path += '/'
     files = glob.glob(path + '.data-audioset/train/audio/_background_noise_/*.wav')
@@ -261,6 +266,14 @@ def split_silence_to_chunks(path=''):
 
 # limit_11 -- percentage of 11-th class that is to remain in datasets (values from 0 to 1)
 def get_audio_datasets(path='', limit_11=0.5, preprocess_params=default_params, transforms=default_transforms):
+    """
+    create datasets from audio files
+    :param path: non-absolute path to audio files
+    :param limit_11: percentage of "unknown" class to include in datasets
+    :param preprocess_params: preprocessing parameters
+    :param transforms: augmentations for training dataset
+    :return: train, test and validation datasets
+    """
     if len(path) > 0 and path[-1] != '/':
         path += '/'
     # GET FULL DATASET
@@ -299,8 +312,8 @@ def get_audio_datasets(path='', limit_11=0.5, preprocess_params=default_params, 
     for dats in ['train', 'val', 'test']:
         if not os.path.exists('.data-audioset/cached_' + dats):
             os.makedirs('.data-audioset/cached_' + dats)
-        # files = glob.glob('.data-audioset/cached_' + dats + '/*') #emptying cache
-        # for f in files:
+        # files = glob.glob('.data-audioset/cached_' + dats + '/*') #emptying cache <- disabled
+        # for f in files: # IT IS ADVISED TO ENABLE EMPTYING CACHE WHEN PREPROCESSING PARAMETERS ARE CHANGED
         #    os.remove(f)
     return train_dataset, test_dataset, valid_dataset
 
@@ -380,11 +393,17 @@ def load_audio_dataloaders_timeshift_freqmask(path='', bs=16, limit_11=0.5, num_
                                              preprocess_params=default_params,
                                              transforms=augments)
 
+# -------------------------END OF CUSTOM DATALOADER GETTERS------------------------
 
 def cache_all(preprocess_params=default_params, transforms=default_transforms):
+    """
+    Cache all dataset entries to speed up learning process
+    :param preprocess_params: parameters for preprocessing
+    :param transforms: augmentations for training dataset (time domain augmentations are also cached)
+    """
     train_dataset, test_dataset, valid_dataset = get_audio_datasets(limit_11=1,
                                                                     preprocess_params=preprocess_params,
-                                                                    transforms=default_transforms)
+                                                                    transforms=transforms)
     # simply access all the files, they will all get cached
     print("Processing train dataset:")
     for a in range(len(train_dataset)):
@@ -403,6 +422,7 @@ def cache_all(preprocess_params=default_params, transforms=default_transforms):
     print("Validation dataset processed")
 
 
+# AUDIO DATASET CLASS
 class AudioDataset(Dataset):
     def __init__(self, data, cache_str, mfcc=True, scale=False, to_db=True, transform_time=None, transform_spec=None,
                  sr=16_000, n_fft=512,
