@@ -38,7 +38,7 @@ class DataPrep:
     def save_cache(path, spec, string):
         cached_path = str.split(path, '.wav')
         cached_path = cached_path[0] + f'_cached_' + \
-                      str.split(path, '/')[3]  # adding class name because not all names are unique
+                      str.split(path, '/')[3]  # adding class name because not all file names are unique
         cached_path = re.sub('train/audio/.*/', f'cached_{string}/', cached_path)
         torch.save(spec, cached_path)
 
@@ -46,7 +46,7 @@ class DataPrep:
     def save_cache_aug(path, spec, string, aug):
         cached_path = str.split(path, '.wav')
         cached_path = cached_path[0] + f'_cached_' + \
-                      str.split(path, '/')[3] + "_" + aug  # adding class name because not all names are unique
+                      str.split(path, '/')[3] + "_" + aug  # adding class name because not all file names are unique
         cached_path = re.sub('train/audio/.*/', f'cached_{string}/', cached_path)
         torch.save(spec, cached_path)
 
@@ -264,12 +264,11 @@ def split_silence_to_chunks(path=''):
     return df_silence, names
 
 
-# limit_11 -- percentage of 11-th class that is to remain in datasets (values from 0 to 1)
 def get_audio_datasets(path='', limit_11=0.5, preprocess_params=default_params, transforms=default_transforms):
     """
     create datasets from audio files
     :param path: non-absolute path to audio files
-    :param limit_11: percentage of "unknown" class to include in datasets
+    :param limit_11: percentage of "unknown" class to include in datasets (values from 0 to 1)
     :param preprocess_params: preprocessing parameters
     :param transforms: augmentations for training dataset
     :return: train, test and validation datasets
@@ -342,7 +341,7 @@ def load_audio_dataloaders_timeshift(path='', bs=16, limit_11=0.5, rate=5):
 
 
 def load_audio_dataloaders_pitchshift(path='', bs=16, limit_11=0.5, rate=5):
-    # rate <- parameter for the time shift
+    # rate <- parameter for the pitch shift
     augments = {
         'transform_time': PitchShift(rate),
         'transform_spec': None
@@ -353,7 +352,7 @@ def load_audio_dataloaders_pitchshift(path='', bs=16, limit_11=0.5, rate=5):
 
 
 def load_audio_dataloaders_speedshift(path='', bs=16, limit_11=0.5, rate=5):
-    # rate <- parameter for the time shift
+    # rate <- parameter for the speed shift
     augments = {
         'transform_time': SpeedShift(rate),
         'transform_spec': None
@@ -364,7 +363,7 @@ def load_audio_dataloaders_speedshift(path='', bs=16, limit_11=0.5, rate=5):
 
 
 def load_audio_dataloaders_timemask(path='', bs=16, limit_11=0.5, num_masks=1, limit=5):
-    # num_masks = 1, time_limit
+    # num_masks , time_limit <- parameters for time masking
     augments = {
         'transform_time': None,
         'transform_spec': TimeMask(num_masks, time_limit=limit)
@@ -375,6 +374,7 @@ def load_audio_dataloaders_timemask(path='', bs=16, limit_11=0.5, num_masks=1, l
 
 
 def load_audio_dataloaders_freqmask(path='', bs=16, limit_11=0.5, num_masks=1, limit=5):
+    # num_masks , time_limit <- parameters for frequency masking
     augments = {
         'transform_time': None,
         'transform_spec': FreqMask(num_masks, freq_limit=limit)
