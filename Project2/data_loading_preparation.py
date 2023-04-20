@@ -193,7 +193,7 @@ class TimeMask(object):
 
 
 class TimeShift(object):
-    def __init__(self, rate, p=0.5):
+    def __init__(self, rate=5, p=0.5):
         self.rate = rate
         self.p = p
 
@@ -204,7 +204,7 @@ class TimeShift(object):
 
 
 class PitchShift(object):
-    def __init__(self, rate, p=0.5):
+    def __init__(self, rate=5, p=0.5):
         self.rate = rate
         self.p = p
 
@@ -225,10 +225,10 @@ class SpeedShift(object):
         return data_aug
 
 # ALL THE POSSIBLE AUGMENTS AS A REFERENCE
-augments = {
-    'transform_time': [TimeShift(5), PitchShift(5), SpeedShift(5)],
-    'transform_spec': [FreqMask(5), TimeMask(5)]
-}
+#augments = {
+#    'transform_time': [TimeShift(5), PitchShift(5), SpeedShift(5)],
+#    'transform_spec': [FreqMask(5), TimeMask(5)]
+#}
 
 
 # -------------------------END OF TRANSFORMATION CLASSES-------------------------
