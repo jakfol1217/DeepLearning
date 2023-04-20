@@ -464,7 +464,10 @@ class AudioDataset(Dataset):
                 spec_aug = DataPrep.load_cached(path, str.split(path, '/')[3], self.cache_str, 'aug')
                 spec = spec_aug
             # SPECTOGRAM AUGMENTATION
-            spec_aug = self._augment_spec(spec)
+            if lbl != 11:
+                spec_aug = self._augment_spec(spec)
+            else:
+                spec_aug = spec
             return spec_aug, self.data['label'].iloc[item]
         # IF NOT CACHED, FILE PREPARATION
         file, sr = DataPrep.load(path, sr)
@@ -478,7 +481,10 @@ class AudioDataset(Dataset):
         # SAVE SPEC TO CACHE
         DataPrep.save_cache(path, spec, self.cache_str)
         # SPECTOGRAM AUGMENTATION
-        spec_aug = self._augment_spec(spec)
+        if lbl != 11:
+            spec_aug = self._augment_spec(spec)
+        else:
+            spec_aug = spec
         return spec_aug, self.data['label'].iloc[item]
 
     def _preprocess(self, data):
