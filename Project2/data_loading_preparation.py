@@ -226,8 +226,8 @@ class SpeedShift(object):
 
 # ALL THE POSSIBLE AUGMENTS AS A REFERENCE
 augments = {
-    'transform_time': [TimeShift(), PitchShift(), SpeedShift()],
-    'transform_spec': [FreqMask(), TimeMask()]
+    'transform_time': [TimeShift(5), PitchShift(5), SpeedShift(5)],
+    'transform_spec': [FreqMask(5), TimeMask(5)]
 }
 
 
