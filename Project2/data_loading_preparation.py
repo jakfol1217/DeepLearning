@@ -456,19 +456,23 @@ class AudioDataset(Dataset):
 
     def __getitem__(self, item):
         path, sr = self.data['file'].iloc[item], self.sr
+        lbl = self.data['label'].iloc[item]
         # LOADING CACHED FILE (TENSOR FILE)
         spec = DataPrep.load_cached(path, str.split(path, '/')[3], self.cache_str)
         if spec is not None:
-            if self.transform_time is not None and random.uniform(0, 1) <= self.p:
+            if lbl != 11 and self.transform_time is not None and random.uniform(0, 1) <= self.p:
                 spec_aug = DataPrep.load_cached(path, str.split(path, '/')[3], self.cache_str, 'aug')
                 spec = spec_aug
             # SPECTOGRAM AUGMENTATION
-            spec_aug = self._augment_spec(spec)
+            if lbl != 11:
+                spec_aug = self._augment_spec(spec)
+            else:
+                spec_aug = spec
             return spec_aug, self.data['label'].iloc[item]
         # IF NOT CACHED, FILE PREPARATION
         file, sr = DataPrep.load(path, sr)
         # TIME AUGMENTATION CACHING
-        if self.transform_time is not None:
+        if lbl != 11 and self.transform_time is not None:
             file_aug, name = self._augment_time(file)
             if len(name) > 0:
                 spec_aug = self._preprocess(file_aug)
@@ -477,7 +481,10 @@ class AudioDataset(Dataset):
         # SAVE SPEC TO CACHE
         DataPrep.save_cache(path, spec, self.cache_str)
         # SPECTOGRAM AUGMENTATION
-        spec_aug = self._augment_spec(spec)
+        if lbl != 11:
+            spec_aug = self._augment_spec(spec)
+        else:
+            spec_aug = spec
         return spec_aug, self.data['label'].iloc[item]
 
     def _preprocess(self, data):
