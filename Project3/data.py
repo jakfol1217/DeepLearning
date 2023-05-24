@@ -7,7 +7,6 @@ import torch
 
 DATA_PATH = '.data/data0/lsun/bedroom'
 DEVICE = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-IMAGE_SIZE = 64
 SEED = 1217
 random.seed(SEED)
 torch.manual_seed(SEED)
@@ -27,10 +26,10 @@ def load_dataloaders(transform, bs=64):
 
 
 # main function to load data
-def load_dataloader_preprocess(bs=64):
+def load_dataloader_preprocess(image_size=64, bs=64):
     transform = torchvision.transforms.Compose([
-        torchvision.transforms.Resize(IMAGE_SIZE),
-        torchvision.transforms.CenterCrop(IMAGE_SIZE),
+        torchvision.transforms.Resize(image_size),
+        torchvision.transforms.CenterCrop(image_size),
         torchvision.transforms.ToTensor(),
         torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
     ])
