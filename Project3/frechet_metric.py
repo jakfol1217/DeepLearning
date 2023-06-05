@@ -50,3 +50,31 @@ def fid_metric(real_images, fake_images, device='cuda', image_size=64, bs=64):
     mu_2, cov_2 = act_2.mean(axis=0), np.cov(act_2, rowvar=False)
 
     return calculate_frechet_distance(mu_1, mu_2, cov_1, cov_2)
+
+
+# helper to generate images using a generative model
+def generate_images_to_path(
+    model,
+    path,
+    batch_size,
+    latent_size,
+    img_size = 64
+):
+    from torchvision.utils import save_image
+    import numpy as np
+    import os
+    
+    try:
+        os.makedirs(path)
+    except FileExistsError:
+        pass
+    
+    
+    cuda = True if torch.cuda.is_available() else False
+    Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
+    z = Tensor(np.random.normal(0, 1, (batch_size, latent_size)))
+    gen_imgs = model(z)
+
+    for i, el in enumerate(gen_imgs):
+        el = el.reshape(1, 3, img_size, img_size)
+        save_image(el, path + "%d.png" % i, nrow=1, normalize=True, padding=0)
